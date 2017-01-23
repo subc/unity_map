@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\scr.cs" />
+     <Compile Include="Assets\src\Road.cs" />
      <Compile Include="Assets\src\RoomManager.cs" />
      <Compile Include="Assets\src\WorldManager.cs" />
      <Compile Include="Assets\src\camera.cs" />

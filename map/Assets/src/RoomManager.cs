@@ -4,29 +4,63 @@ using UnityEngine;
 
 public class RoomManager {
 	private int[,] roomPos; 
-	public Dictionary<string, int[,]> wallTile; 
-	public Dictionary<string, int[,]> floorTile; 
+	public Dictionary<string, Vector2> wallTile; 
+	public Dictionary<string, Vector2> floorTile; 
 	public RoomManager(){
-		roomPos = new int[100, 100];
-		wallTile = new Dictionary<string, int[,]>();
-		floorTile = new Dictionary<string, int[,]>();
+		roomPos = new int[1000, 1000];
+		wallTile = new Dictionary<string, Vector2>();
+		floorTile = new Dictionary<string, Vector2>();
 	}
 
 	public void setWall(int x, int y){
-		roomTile.Add (getKey (x, y), new int[x, y]);
-		wallTile.Add (getKey (x, y), new int[x, y]);
+		roomPos[x,y] = 1;
+		wallTile.Add (getKey (x, y), new Vector2(x, y));
 	}
 
 	public void setFloor(int x, int y){
-		roomTile.Add (getKey (x, y), new int[x, y]);
-		floorTile.Add (getKey (x, y), new int[x, y]);
+		roomPos[x,y] = 1;
+		floorTile.Add (getKey (x, y), new Vector2(x, y));
 	}
 
 	private string getKey(int x, int y){
 		return x + ":" + y;
 	}
 
-	public void setExit(){
-		
+	public List<Vector2> getRoomExitTile(){
+		float xMin = 0, xMax = 0, yMin = 0, yMax = 0;
+
+		// 部屋の角の座標
+		foreach (Vector2 pos in new List<Vector2>(wallTile.Values)) {
+			if (xMin == 0 || xMax == 0 || yMin == 0 || yMax == 0) {
+				xMin = pos.x;
+				xMax = pos.x;
+				yMin = pos.y;
+				yMax = pos.y;
+			}
+			if (pos.x < xMin) {xMin = pos.x;};
+			if (pos.x > xMax) {xMax = pos.x;};
+			if (pos.y < xMin) {yMin = pos.y;};
+			if (pos.y > xMax) {yMin = pos.y;};
+		}
+
+		// 部屋の角の除いた座標
+		List<Vector2> results = new List<Vector2> ();
+		foreach (Vector2 pos in new List<Vector2>(wallTile.Values)) {
+			if (pos.x == xMin && pos.y == yMin) {
+				continue;
+			}
+			if (pos.x == xMax && pos.y == yMax) {
+				continue;
+			}
+			if (pos.x == xMin && pos.y == yMax) {
+				continue;
+			}
+			if (pos.x == xMax && pos.y == yMin) {
+				continue;
+			}
+			results.Add (pos);
+		}
+		return results;
 	}
+
 }
