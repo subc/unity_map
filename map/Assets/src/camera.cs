@@ -45,7 +45,7 @@ public class camera : MonoBehaviour {
 		} else {
 			targetOrthographicSize = targetsVector.x * (1/_camera.aspect) * 0.5f + 10f;
 		}
-		_camera.orthographicSize =  targetOrthographicSize;
+//		_camera.orthographicSize =  targetOrthographicSize;
 	}
 
 	Vector3 AbsPositionDiff(Transform target1, Transform target2)

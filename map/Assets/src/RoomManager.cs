@@ -63,4 +63,14 @@ public class RoomManager {
 		return results;
 	}
 
+	public Vector2 getCenter(){
+		float x = 0F;
+		float y = 0F;
+		foreach (Vector2 pos in new List<Vector2>(floorTile.Values)) {
+			x += pos.x;
+			y += pos.y;
+		}
+		return new Vector2 (x / floorTile.Count, y / floorTile.Count);
+	}
+
 }
