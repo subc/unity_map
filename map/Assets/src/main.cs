@@ -9,6 +9,7 @@ public class main : MonoBehaviour {
 	public const string FLOOR = "FLOOR";
 	public const string WALL = "WALL";
 	public const string ROAD = "ROAD";
+	public const string DOT = "DOT";
 	public bool refresh = true;
 	bool isRunning = false;
 
@@ -21,7 +22,10 @@ public class main : MonoBehaviour {
 		myCube = GameObject.Find("target1");
 		setColor(myCube, Color.gray);
 
-		genMap ();
+		StartCoroutine(DelayMethod(1.0f, () =>
+			{
+				genMap ();
+			}));
 
 	}
 	
@@ -54,7 +58,7 @@ public class main : MonoBehaviour {
 
 	void genMap(){
 		// 消す
-		crearCube ();
+		clearCube ();
 
 		// 部屋生成のmanager を作成
 		List<RoomManager> rooms = new List<RoomManager>();
@@ -77,7 +81,10 @@ public class main : MonoBehaviour {
 		rooms.Add (r8);
 
 		// set dots
-		createDots(rooms);
+		StartCoroutine(DelayMethod(2.0f, () =>
+			{
+				createDots(rooms);
+			}));
 
 		// road
 		StartCoroutine(DelayMethod(5.5f, () =>
@@ -95,7 +102,7 @@ public class main : MonoBehaviour {
 		//1.5秒後に実行して壁を消す
 		StartCoroutine(DelayMethod(11.5f, () =>
 			{
-				crearWall();
+				clearWall();
 			}));
 	}
 
@@ -168,19 +175,19 @@ public class main : MonoBehaviour {
 			//0.5秒後に実行して壁を消す
 //			StartCoroutine(DelayMethod(0.5f, () =>
 //				{
-//					crearWall();
+//					clearWall();
 //				}));
 //
 //			break;
 		}
 	}
 
-	void crearWall(){
+	void clearWall(){
 		GameObject[] walls = GameObject.FindGameObjectsWithTag (WALL);
 		foreach (GameObject o in walls) {Destroy (o);}
 	}
 
-	void crearCube(){
+	void clearCube(){
 		GameObject[] walls = GameObject.FindGameObjectsWithTag (WALL);
 		GameObject[] floors = GameObject.FindGameObjectsWithTag (FLOOR);
 		GameObject[] roads = GameObject.FindGameObjectsWithTag (ROAD);
@@ -191,46 +198,54 @@ public class main : MonoBehaviour {
 
 	// 全域木の線を引く
 	void createDots (List<RoomManager> rooms){
+		// dotを打つ
 		GameObject prefab = (GameObject)Resources.Load ("Prefabs/Cube");
 		List<GameObject> spherList = new List<GameObject>();
 		foreach (RoomManager room in rooms) {
 			Vector2 center = room.getCenter ();
 			GameObject cube = Instantiate (prefab, new Vector3 (center.x, center.y, -1F), Quaternion.identity);
+			cube.tag = DOT;
 			setColor (cube, Color.green);
 			spherList.Add (cube);
 		}
 
-//		StartCoroutine(createBlock (Road.create (r1, r2)));
-//		StartCoroutine(createBlock (Road.create (r3, r4)));
-//		StartCoroutine(createBlock (Road.create (r2, r3)));
-//		StartCoroutine(createBlock (Road.create (r2, r5)));
-//		StartCoroutine(createBlock (Road.create (r5, r6)));
-//		StartCoroutine(createBlock (Road.create (r6, r7)));
-//		StartCoroutine(createBlock (Road.create (r6, r8)));
+		StartCoroutine(DelayMethod(0.7f, () =>
+			{
+				// 線を引く
+				GameObject c = GameObject.FindGameObjectsWithTag ("MainCamera")[0];
+				LineRenderer lineRenderer = c.AddComponent<LineRenderer> ();;
+				lineRenderer.material.color = Color.green;
+				lineRenderer.SetWidth (0.3f, 0.3f);
+				lineRenderer.SetVertexCount (14);
+				lineRenderer.SetPosition (0, spherList[0].transform.position);
+				lineRenderer.SetPosition (1, spherList[1].transform.position);
+				lineRenderer.SetPosition (2, spherList[2].transform.position);
+				lineRenderer.SetPosition (3, spherList[3].transform.position);
+				lineRenderer.SetPosition (4, spherList[2].transform.position);
+				lineRenderer.SetPosition (5, spherList[1].transform.position);
+				lineRenderer.SetPosition (5, spherList[2].transform.position);
+				lineRenderer.SetPosition (6, spherList[1].transform.position);
+				lineRenderer.SetPosition (7, spherList[4].transform.position);
+				lineRenderer.SetPosition (8, spherList[4].transform.position);
+				lineRenderer.SetPosition (9, spherList[5].transform.position);
+				lineRenderer.SetPosition (10, spherList[5].transform.position);
+				lineRenderer.SetPosition (11, spherList[6].transform.position);
+				lineRenderer.SetPosition (12, spherList[5].transform.position);
+				lineRenderer.SetPosition (13, spherList[7].transform.position);
 
-		// 線を引く
-		GameObject c = GameObject.FindGameObjectsWithTag ("MainCamera")[0];
-		LineRenderer lineRenderer = c.AddComponent<LineRenderer> ();;
-		lineRenderer.material.color = Color.green;
-		lineRenderer.SetWidth (0.3f, 0.3f);
-		lineRenderer.SetVertexCount (14);
-		lineRenderer.SetPosition (0, spherList[0].transform.position);
-		lineRenderer.SetPosition (1, spherList[1].transform.position);
+				// 線を消す
+				StartCoroutine(DelayMethod(4.3f, () =>
+					{
+						Destroy(lineRenderer);
+					}));
+				// dotを消す
+				StartCoroutine(DelayMethod(7.3f, () =>
+					{
+						GameObject[] dots = GameObject.FindGameObjectsWithTag (DOT);
+						foreach (GameObject o in dots) {Destroy (o);}
+					}));
 
-		lineRenderer.SetPosition (2, spherList[2].transform.position);
-		lineRenderer.SetPosition (3, spherList[3].transform.position);
+			}));
 
-		lineRenderer.SetPosition (4, spherList[2].transform.position);
-		lineRenderer.SetPosition (5, spherList[1].transform.position);
-		lineRenderer.SetPosition (5, spherList[2].transform.position);
-		lineRenderer.SetPosition (6, spherList[1].transform.position);
-		lineRenderer.SetPosition (7, spherList[4].transform.position);
-		lineRenderer.SetPosition (8, spherList[4].transform.position);
-		lineRenderer.SetPosition (9, spherList[5].transform.position);
-		lineRenderer.SetPosition (10, spherList[5].transform.position);
-		lineRenderer.SetPosition (11, spherList[6].transform.position);
-
-		lineRenderer.SetPosition (12, spherList[5].transform.position);
-		lineRenderer.SetPosition (13, spherList[7].transform.position);
 	}
 }
