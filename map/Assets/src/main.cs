@@ -10,25 +10,153 @@ public class main : MonoBehaviour {
 	public const string WALL = "WALL";
 	public const string ROAD = "ROAD";
 	public const string DOT = "DOT";
+	public enum Dire {Up, Down, Right, Left};  
 	public bool refresh = true;
 	bool isRunning = false;
 
 	// Use this for initialization
 	void Start () {
 		// 背景に色
-		setColor(GameObject.Find("bg"), Color.black);
+//		setColor(GameObject.Find("bg"), Color.black);
 
-		// カメラ用
-		myCube = GameObject.Find("target1");
-		setColor(myCube, Color.gray);
+		// 全て壁で埋める
+		genWallAll();
 
-		StartCoroutine(DelayMethod(1.0f, () =>
-			{
-				genMap ();
-			}));
+		// 掘る
+		int ct = 0;
+		List<Vector2> results = dig (1, 1, true);
+		while (ct < 1000) {
+			ct+=1;
+			// 道をランダムで選ぶ
+			Vector2 startPos = results[ Random.Range(0, results.Count) ];
+			results.AddRange(dig ((int)startPos.x, (int)startPos.y, false));
+			Debug.Log ("Count :" + results.Count);
+			if (results.Count >= 400) {
+				break;
+			}
+		}
+
+		// 実際に掘る
+		StartCoroutine ("delBlock", results);  
+
 
 	}
-	
+
+	public void createExit(List<Vector2> results){
+		GameObject prefab = (GameObject)Resources.Load ("Prefabs/Tile");
+		// start
+		GameObject cube = Instantiate (prefab, new Vector3(1, 1, -1F), Quaternion.identity);
+		setColor (cube, Color.red);
+
+		// 一番遠い出口を探す
+		Vector2 start = new Vector2(1, 1);
+		Vector2 exit = new Vector2(1, 2);
+		foreach (Vector2 pos in results) {
+			if (Vector2.Distance (start, exit) < Vector2.Distance (start, pos)) {
+				exit = pos;
+			}
+		}
+		GameObject exitCube = Instantiate (prefab, new Vector3(exit.x, exit.y, -1F), Quaternion.identity);
+		setColor (exitCube, Color.red);
+	}
+
+	IEnumerator delBlock(List<Vector2> results){
+		int count = 0;
+		foreach (Vector2 pos in results) {
+			count += 1;
+			Destroy(m.getWall((int)pos.x, (int)pos.y));
+			if (count <= 500){
+				yield return new WaitForSeconds (0.01f);
+			} else if(count <= 1000){
+				yield return new WaitForSeconds (0.005f);
+			} else{
+				yield return new WaitForSeconds (0.002f);
+			}
+		}
+		// 出口をprotする
+		createExit(results);
+		yield return new WaitForSeconds (0.002f);
+	}
+
+	List<Vector2> dig(int startX, int startY, bool first){
+		// 開始地点を決める
+		int x = startX; // 開始地点は偶数でないといけない
+		int y = startY; // 開始地点は偶数でないといけない
+
+		// 最初の掘り
+		if (first) {
+			Destroy (m.destroyWall (x, y));
+		}
+
+		// 無限ループ
+		bool deleted = true;
+		int ct = 0;
+		List<Vector2> results = new List<Vector2> ();
+		while (deleted) {
+			deleted = false;
+			int i = Random.Range(1, 5);
+			// 上下
+			if (i == 1 && m.used (x, y + 2) && m.used (x, y + 1) && m.used (x + 1, y + 1) && m.used (x - 1, y + 1)) {
+				y += 1;
+				m.checkout (x, y);
+//				Destroy(m.destroyWall(x, y));
+				deleted = true;
+			}
+			if (i == 2 && m.used (x, y - 2) && m.used (x, y - 1)&& m.used (x + 1, y - 1) && m.used (x - 1, y - 1)) {
+				y += -1;
+				m.checkout (x, y);
+//				Destroy(m.destroyWall(x, y));
+				deleted = true;
+			}
+			// 左右
+			if (i == 3 && m.used (x - 2, y) && m.used (x - 1, y) && m.used (x - 1, y + 1) && m.used (x - 1, y - 1)) {
+				x += -1;
+				m.checkout (x, y);
+//				Destroy(m.destroyWall(x,y));
+				deleted = true;
+			}
+			if (i == 4 && m.used (x + 2, y) && m.used (x + 1, y)&& m.used (x + 1, y + 1) && m.used (x + 1, y - 1)) {
+				x += 1;
+				m.checkout (x, y);
+//				Destroy(m.destroyWall(x,y));
+				deleted = true;
+			}
+			if (!deleted && ct <= 30) {
+				ct += 1;
+				deleted = true;
+			} else {
+				// 削除成功してる
+				results.Add (new Vector2(x, y));
+			}
+		}
+		return results;
+	}
+
+	void genWallAll(){
+		m = new WorldManager (1000, 1000);
+
+		// 部屋作成
+		int xMax = 32;
+		int yMax = 20;
+
+		GameObject prefab = (GameObject)Resources.Load ("Prefabs/Tile");
+
+		for(int x=0; x<=xMax; ++x)
+		{
+			for(int y=0; y<=yMax; ++y)
+			{
+				// xy の値を、幅をそろえて表示
+				// プレハブからインスタンスを生成
+				GameObject cube = Instantiate (prefab, new Vector3(x, y, 0), Quaternion.identity);
+				m.checkin (x, y, cube); // WorldManagerに登録
+
+				// wall
+				cube.tag = WALL;
+//				setColor (cube, Color.black);
+			}
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		if (refresh && !isRunning) {
@@ -141,7 +269,7 @@ public class main : MonoBehaviour {
 				// xy の値を、幅をそろえて表示
 				// プレハブからインスタンスを生成
 				GameObject cube = Instantiate (prefab, posBase + new Vector3(x, y, 0), Quaternion.identity);
-				m.checkin ((int)posBase.x + x, (int)posBase.y + y); // WorldManagerに登録
+//				m.checkin ((int)posBase.x + x, (int)posBase.y + y); // WorldManagerに登録
 				if (x == 0 || x == xMax || y == 0 || y == yMax)
 				{
 					// wall
