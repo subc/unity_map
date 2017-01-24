@@ -19,8 +19,7 @@ public class main : MonoBehaviour {
 		setColor(GameObject.Find("bg"), Color.black);
 
 		// カメラ用
-		myCube = GameObject.Find("target1");
-		setColor(myCube, Color.gray);
+
 
 		StartCoroutine(DelayMethod(1.0f, () =>
 			{
@@ -71,6 +70,18 @@ public class main : MonoBehaviour {
 		RoomManager r6 = createRoom (new Vector3 (22, 38, 0), 6);
 		RoomManager r7 = createRoom (new Vector3 (33, 45, 0), 6);
 		RoomManager r8 = createRoom (new Vector3 (33, 35, 0), 4);
+
+		// 左上
+		RoomManager r9 = createRoom (new Vector3 (22, 52, 0), 4);
+		RoomManager r10 = createRoom (new Vector3 (12, 50, 0), 6);
+		RoomManager r11 = createRoom (new Vector3 (0, 53, 0), 5);
+		RoomManager r12 = createRoom (new Vector3 (2, 63, 0), 6);
+		RoomManager r13 = createRoom (new Vector3 (13, 67, 0), 6);
+
+		// 右
+		RoomManager r14 = createRoom (new Vector3 (50, 45, 0), 6);
+		RoomManager r15 = createRoom (new Vector3 (52, 32, 0), 6);
+
 		rooms.Add (r1);
 		rooms.Add (r2);
 		rooms.Add (r3);
@@ -79,6 +90,13 @@ public class main : MonoBehaviour {
 		rooms.Add (r6);
 		rooms.Add (r7);
 		rooms.Add (r8);
+		rooms.Add (r9);
+		rooms.Add (r10);
+		rooms.Add (r11);
+		rooms.Add (r12);
+		rooms.Add (r13);
+		rooms.Add (r14);
+		rooms.Add (r15);
 
 		// set dots
 		StartCoroutine(DelayMethod(2.0f, () =>
@@ -96,6 +114,17 @@ public class main : MonoBehaviour {
 				StartCoroutine(createBlock (Road.create (r5, r6)));
 				StartCoroutine(createBlock (Road.create (r6, r7)));
 				StartCoroutine(createBlock (Road.create (r6, r8)));
+
+				// 右上
+				StartCoroutine(createBlock (Road.create (r5, r10)));
+				StartCoroutine(createBlock (Road.create (r9, r10)));
+				StartCoroutine(createBlock (Road.create (r10, r11)));
+				StartCoroutine(createBlock (Road.create (r11, r12)));
+				StartCoroutine(createBlock (Road.create (r12, r13)));
+
+				// 左
+				StartCoroutine(createBlock (Road.create (r7, r14)));
+				StartCoroutine(createBlock (Road.create (r14, r15)));
 			}));
 		
 
@@ -216,7 +245,7 @@ public class main : MonoBehaviour {
 				LineRenderer lineRenderer = c.AddComponent<LineRenderer> ();;
 				lineRenderer.material.color = Color.green;
 				lineRenderer.SetWidth (0.3f, 0.3f);
-				lineRenderer.SetVertexCount (14);
+				lineRenderer.SetVertexCount (28);
 				lineRenderer.SetPosition (0, spherList[0].transform.position);
 				lineRenderer.SetPosition (1, spherList[1].transform.position);
 				lineRenderer.SetPosition (2, spherList[2].transform.position);
@@ -232,6 +261,35 @@ public class main : MonoBehaviour {
 				lineRenderer.SetPosition (11, spherList[6].transform.position);
 				lineRenderer.SetPosition (12, spherList[5].transform.position);
 				lineRenderer.SetPosition (13, spherList[7].transform.position);
+				lineRenderer.SetPosition (14, spherList[5].transform.position);
+				lineRenderer.SetPosition (15, spherList[6].transform.position);
+
+				lineRenderer.SetPosition (16, spherList[13].transform.position);
+				lineRenderer.SetPosition (17, spherList[14].transform.position);
+				lineRenderer.SetPosition (18, spherList[13].transform.position);
+				lineRenderer.SetPosition (19, spherList[6].transform.position);
+				lineRenderer.SetPosition (20, spherList[5].transform.position);
+
+				// 右上
+				lineRenderer.SetPosition (21, spherList[4].transform.position);
+				lineRenderer.SetPosition (22, spherList[9].transform.position);
+				lineRenderer.SetPosition (23, spherList[8].transform.position);
+				lineRenderer.SetPosition (24, spherList[9].transform.position);
+				lineRenderer.SetPosition (25, spherList[10].transform.position);
+				lineRenderer.SetPosition (26, spherList[11].transform.position);
+				lineRenderer.SetPosition (27, spherList[12].transform.position);
+//				lineRenderer.SetPosition (28, spherList[13].transform.position);
+
+				// 右上
+//				StartCoroutine(createBlock (Road.create (r5, r10)));
+//				StartCoroutine(createBlock (Road.create (r9, r10)));
+//				StartCoroutine(createBlock (Road.create (r10, r11)));
+//				StartCoroutine(createBlock (Road.create (r11, r12)));
+//				StartCoroutine(createBlock (Road.create (r12, r13)));
+//
+//				// 左
+//				StartCoroutine(createBlock (Road.create (r7, r14)));
+//				StartCoroutine(createBlock (Road.create (r14, r15)));
 
 				// 線を消す
 				StartCoroutine(DelayMethod(4.3f, () =>
