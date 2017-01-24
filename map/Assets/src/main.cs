@@ -16,30 +16,29 @@ public class main : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		// 背景に色
-//		setColor(GameObject.Find("bg"), Color.black);
+		StartCoroutine(DelayMethod(2.0f, () =>
+			{
+				// 全て壁で埋める
+				genWallAll();
 
-		// 全て壁で埋める
-		genWallAll();
+				// 掘る
+				int ct = 0;
+				List<Vector2> results = dig (1, 1, true);
+				while (ct < 1000) {
+					ct+=1;
+					// 道をランダムで選ぶ
+					Vector2 startPos = results[ Random.Range(0, results.Count) ];
+					results.AddRange(dig ((int)startPos.x, (int)startPos.y, false));
+					Debug.Log ("Count :" + results.Count);
+					if (results.Count >= 400) {
+						break;
+					}
+				}
 
-		// 掘る
-		int ct = 0;
-		List<Vector2> results = dig (1, 1, true);
-		while (ct < 1000) {
-			ct+=1;
-			// 道をランダムで選ぶ
-			Vector2 startPos = results[ Random.Range(0, results.Count) ];
-			results.AddRange(dig ((int)startPos.x, (int)startPos.y, false));
-			Debug.Log ("Count :" + results.Count);
-			if (results.Count >= 400) {
-				break;
-			}
-		}
+				// 実際に掘る
+				StartCoroutine ("delBlock", results);  
 
-		// 実際に掘る
-		StartCoroutine ("delBlock", results);  
-
-
+			}));
 	}
 
 	public void createExit(List<Vector2> results){
